@@ -20,12 +20,11 @@ public class SecurityConfiguration {
                 .and()
                 .authorizeRequests()
                 .antMatchers("/api/register", "/api/login", "/api/accounts","/api/transactions").permitAll()
-                .antMatchers("/api/account/**").permitAll()
+                .antMatchers("/api/accounts/**").permitAll()
                 .antMatchers("/api/transactions/**").permitAll()
                 .anyRequest().authenticated();
         return http.build();
     }
-
 
     @Bean
     public PasswordEncoder passwordEncoder() {
