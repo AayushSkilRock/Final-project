@@ -19,11 +19,13 @@ public class SecurityConfiguration {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .antMatchers("/api/register", "/api/login", "/api/accounts").permitAll()
+                .antMatchers("/api/register", "/api/login", "/api/accounts","/api/transactions").permitAll()
                 .antMatchers("/api/account/**").permitAll()
+                .antMatchers("/api/transactions/**").permitAll()
                 .anyRequest().authenticated();
         return http.build();
     }
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {
