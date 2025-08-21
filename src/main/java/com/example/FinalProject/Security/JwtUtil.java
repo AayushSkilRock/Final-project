@@ -12,15 +12,9 @@ public class JwtUtil {
 
     private static final String SECRET = "fbwefgebfhewgfvejhfbguyfhgvjfhbfkjebwfjEWBEJHVBEJHBWFJHVB";
 
-    public String generateToken(String username) {
-        return Jwts.builder()
-                .setSubject(username)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 3600000)) // 1 hour
-                .signWith(SignatureAlgorithm.HS256, SECRET)
-                .compact();
+    public String generateToken(String username, String role) {
+        return Jwts.builder().setSubject(username).claim("role", role).setIssuedAt(new Date()).setExpiration(new Date(System.currentTimeMillis() + 3600000)).signWith(SignatureAlgorithm.HS256, SECRET).compact();
     }
-
     public static String extractUsername(String token) {
         return Jwts.parser().setSigningKey(SECRET).parseClaimsJws(token).getBody().getSubject();
     }
@@ -35,10 +29,6 @@ public class JwtUtil {
     }
 
     public Long extractUserId(String token) {
-        return Long.parseLong(Jwts.parser()
-                .setSigningKey(SECRET)
-                .parseClaimsJws(token)
-                .getBody()
-                .getId());
+        return Long.parseLong(Jwts.parser().setSigningKey(SECRET).parseClaimsJws(token).getBody().getId());
     }
 }
