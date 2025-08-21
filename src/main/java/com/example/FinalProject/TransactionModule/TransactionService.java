@@ -51,8 +51,19 @@ public class TransactionService {
                 throw new RuntimeException("Insufficient balance. Available balance: " + account.getBalance());
             }
 
-            Transaction transaction = Transaction.builder().transactionType(TransactionType.WITHDRAW).build();
-            account.setBalance(account.getBalance() - amount);
+            double updatedBalance = account.getBalance() - amount;
+
+            Transaction transaction = Transaction.builder()
+                    .transactionType(TransactionType.WITHDRAW)
+                    .amount(amount)
+                    .description(description != null ? description : "Money Withdrawal")
+                    .fromAccount(account)
+                    .toAccount(null)
+                    .balanceAfterTransaction(updatedBalance)
+                    .status("SUCCESS")
+                    .build();
+
+            account.setBalance(updatedBalance);
             accountRepository.save(account);
 
             return transactionRepository.save(transaction);
@@ -60,12 +71,23 @@ public class TransactionService {
         } catch (Exception e) {
             Account account = accountRepository.findById(accountId).orElse(null);
             if (account != null) {
-                Transaction failedTransaction = Transaction.builder().transactionType(TransactionType.WITHDRAW).amount(amount).description("Failed: " + e.getMessage()).fromAccount(account).toAccount(null).balanceAfterTransaction(account.getBalance()).status("FAILED").build();
+                Transaction failedTransaction = Transaction.builder()
+                        .transactionType(TransactionType.WITHDRAW)
+                        .amount(amount)
+                        .description("Failed: " + e.getMessage())
+                        .fromAccount(account)
+                        .toAccount(null)
+                        .balanceAfterTransaction(account.getBalance())
+                        .status("FAILED")
+                        .build();
+
                 transactionRepository.save(failedTransaction);
             }
+
             throw new RuntimeException("Withdrawal failed: " + e.getMessage());
         }
     }
+
 
     @Transactional
     public Transaction transfer(Long fromAccountId, Long toAccountId, String toAccountNumber, Double amount, String description, User authenticatedUser) {
